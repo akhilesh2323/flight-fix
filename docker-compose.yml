@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: flightfix_db
+      MYSQL_USER: flightfix_user
+      MYSQL_PASSWORD: flightfix_secure_password_2026
+      MYSQL_ROOT_PASSWORD: root_secure_password_2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+    restart: always
+    environment:
+      USE_MYSQL: "True"
+      DB_NAME: flightfix_db
+      DB_USER: flightfix_user
+      DB_PASSWORD: flightfix_secure_password_2026
+      DB_HOST: db
+      DB_PORT: 3306
+      SECRET_KEY: flightfix-aviation-mro-secure-key-2026-xyz!
+      DEBUG: "False"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
